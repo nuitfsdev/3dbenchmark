@@ -1,0 +1,12 @@
+# Install PyTorch separately for the CUDA version of the target machine:
+# https://pytorch.org/get-started/locally/
+# Example for a CUDA 12.4 Linux environment:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+transformers>=4.57.0
+accelerate>=1.0.0
+safetensors>=0.5.0
+pandas>=2.2.0
+Pillow>=10.0.0,<12
+tqdm>=4.66.0
+gdown>=5.2.0
+pycocoevalcap>=1.2
