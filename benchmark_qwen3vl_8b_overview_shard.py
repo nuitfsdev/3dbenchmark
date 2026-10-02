@@ -150,6 +150,13 @@ def run_checked(command: list[str]) -> None:
     subprocess.run(command, check=True)
 
 
+def normalize_drive_url(url: str) -> str:
+    match = re.search(r"drive\.google\.com/file/d/([^/?#]+)", url)
+    if match:
+        return f"https://drive.google.com/uc?id={match.group(1)}"
+    return url
+
+
 def download_drive(url: str, destination: Path, redownload: bool = False) -> Path:
     destination = destination.expanduser().resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -158,7 +165,7 @@ def download_drive(url: str, destination: Path, redownload: bool = False) -> Pat
         return destination
     if destination.exists():
         destination.unlink()
-    run_checked([sys.executable, "-m", "gdown", url, "-O", str(destination)])
+    run_checked([sys.executable, "-m", "gdown", normalize_drive_url(url), "-O", str(destination)])
     if not destination.is_file() or destination.stat().st_size == 0:
         raise RuntimeError(f"Google Drive download is missing or empty: {destination}")
     return destination
