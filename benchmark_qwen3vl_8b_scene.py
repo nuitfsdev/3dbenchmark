@@ -92,6 +92,13 @@ def run_or_raise(command: list[str]) -> None:
     subprocess.run(command, check=True)
 
 
+def normalize_drive_url(url: str) -> str:
+    match = re.search(r"drive\.google\.com/file/d/([^/?#]+)", url)
+    if match:
+        return f"https://drive.google.com/uc?id={match.group(1)}"
+    return url
+
+
 def extract_scene_archive(archive: Path, target: Path) -> Path:
     archive = archive.expanduser().resolve()
     if not archive.is_file():
@@ -118,7 +125,7 @@ def resolve_data_root(args: argparse.Namespace) -> Path:
             download_dir.mkdir(parents=True, exist_ok=True)
             archive = download_dir / "scene.zip"
             if not archive.is_file():
-                run_or_raise([sys.executable, "-m", "gdown", args.scene_url, "-O", str(archive)])
+                run_or_raise([sys.executable, "-m", "gdown", normalize_drive_url(args.scene_url), "-O", str(archive)])
         if archive is None:
             raise ValueError("Cần một trong: --data-root, --scene-archive, hoặc --scene-url")
         extracted = extract_scene_archive(archive, args.work_dir.expanduser() / "extracted")
@@ -175,7 +182,7 @@ def resolve_annotation(args: argparse.Namespace, data_root: Path) -> Path:
         destination = args.work_dir.expanduser() / "annotations" / names[args.split]
         destination.parent.mkdir(parents=True, exist_ok=True)
         if not destination.is_file():
-            run_or_raise([sys.executable, "-m", "gdown", args.annotation_url, "-O", str(destination)])
+            run_or_raise([sys.executable, "-m", "gdown", normalize_drive_url(args.annotation_url), "-O", str(destination)])
         return destination.resolve()
     return find_questions_file(data_root, args.split)
 

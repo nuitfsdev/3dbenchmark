@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import zipfile
@@ -47,6 +48,14 @@ def shard_tag(index: int, total: int) -> str:
     return f"shard_{index:0{width}d}_of_{total:0{width}d}"
 
 
+def normalize_drive_url(url: str) -> str:
+    """Convert a Google Drive sharing URL to the direct form accepted by new gdown."""
+    match = re.search(r"drive\.google\.com/file/d/([^/?#]+)", url)
+    if match:
+        return f"https://drive.google.com/uc?id={match.group(1)}"
+    return url
+
+
 def download(url: str, destination: Path, redownload: bool) -> Path:
     destination = destination.resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -56,7 +65,7 @@ def download(url: str, destination: Path, redownload: bool) -> Path:
 
     temporary = destination.with_suffix(destination.suffix + ".part")
     temporary.unlink(missing_ok=True)
-    command = [sys.executable, "-m", "gdown", url, "-O", str(temporary)]
+    command = [sys.executable, "-m", "gdown", normalize_drive_url(url), "-O", str(temporary)]
     print("+", " ".join(command), flush=True)
     try:
         subprocess.run(command, check=True)
