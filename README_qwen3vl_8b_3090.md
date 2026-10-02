@@ -41,6 +41,15 @@ Các file PNG được manifest trỏ đến cũng phải nằm trong archive. N
 
 ## Lệnh trực tiếp và smoke test
 
+Runner natural-color dùng cùng một layout cho cả scene và shard. Archive có thể chứa
+`prepare-data/data/scanqa/ScanQA_v1.0_val.json` cùng
+`prepare-data/outputs/capruner_source_natural_colors/shard_*/manifest.csv`, hoặc đặt
+file annotation và các thư mục `shard_*_of_*` trực tiếp trong ZIP. Chọn phạm vi bằng
+`--scene-id scene0030_00` cho một scene, hoặc bằng
+`--shard-index 1 --num-shards 10` cho toàn bộ shard 1. Không truyền cả hai kiểu chọn.
+Nếu ZIP chỉ chứa một thư mục shard, truyền ScanQA JSON riêng bằng `--annotation-file`
+hoặc `--annotation-url`; không cần đóng gói lại `prepare-data`.
+
 Khi đã giải nén dữ liệu, không cần tải lại Drive:
 
 ```bash

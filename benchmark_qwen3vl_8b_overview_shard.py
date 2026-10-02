@@ -158,7 +158,7 @@ def download_drive(url: str, destination: Path, redownload: bool = False) -> Pat
         return destination
     if destination.exists():
         destination.unlink()
-    run_checked([sys.executable, "-m", "gdown", "--fuzzy", url, "-O", str(destination)])
+    run_checked([sys.executable, "-m", "gdown", url, "-O", str(destination)])
     if not destination.is_file() or destination.stat().st_size == 0:
         raise RuntimeError(f"Google Drive download is missing or empty: {destination}")
     return destination
@@ -514,7 +514,7 @@ def main() -> None:
 
     try:
         import torch
-        from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
+        from transformers import AutoModelForImageTextToText, AutoProcessor
     except ImportError as exc:
         raise SystemExit(
             "Missing dependencies. Install CUDA torch, then: pip install 'transformers>=4.57.0' "
@@ -561,7 +561,7 @@ def main() -> None:
     processor = AutoProcessor.from_pretrained(
         args.model_id, min_pixels=args.min_pixels, max_pixels=args.max_pixels,
     )
-    model = Qwen3VLForConditionalGeneration.from_pretrained(args.model_id, **model_kwargs).eval()
+    model = AutoModelForImageTextToText.from_pretrained(args.model_id, **model_kwargs).eval()
     torch.cuda.synchronize()
     model_load_s = time.perf_counter() - load_started
     print(f"Model loaded in {model_load_s:.1f}s; VRAM {torch.cuda.memory_allocated() / 2**30:.2f} GiB", flush=True)
